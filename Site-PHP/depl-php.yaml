@@ -1,0 +1,53 @@
+---
+version: "2.0"
+
+services:
+  app:
+    image: ubuntu:20.04
+    # ubuntu:20.04 - требует установку часового пояса. 22.04  -нет
+    env:
+      - "my_root_password=1" # root password for ssh connection. 
+    
+    command:
+      - "bash"
+      - "-c"
+    args:
+      # Link at the end of the next line needs to be changed to the location of your start.sh file
+      - 'apt-get update ; apt-get upgrade -y ; apt-get install -y  curl ;   curl -s https://raw.githubusercontent.com/qraga77/Work/main/Site-PHP/start.sh | bash ; sleep infinity'   
+    expose:
+      - port: 80
+        as: 80
+        # accept:
+        #   - "q.ingress.provider-02.sandbox-01.aksh.pw"  
+        # в адресе провайлера левое слово "provaider." заменяем на "СвоёИмя.ingress."
+        to:
+          - global: true
+      - port: 22
+        as: 22
+        to:
+          - global: true   
+profiles:
+  compute:
+    app:
+      resources:
+        # достаточно 0.5, 0.5, 0.5
+        cpu:
+          units: 0.5
+        memory:
+          size: 0.5Gi
+        storage:
+          size: 0.5Gi
+         
+  placement:
+    akash: 
+      attributes:
+            
+      pricing:
+        app:
+          denom: uakt
+          amount: 10000
+deployment:
+  app:
+    akash:
+      profile: app
+      count: 1 
